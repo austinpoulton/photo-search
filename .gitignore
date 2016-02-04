@@ -1,0 +1,34 @@
+# ignore all idea related meta files/dirs
+.idea
+/.idea_modules
+*.iml
+.project
+.metadata
+/.classpath
+/.settings
+server.pid
+.cache-main
+.cache-tests
+
+# ignore targets - compile distributables
+target
+log
+project/target
+project/project
+dist
+bin
+# ignore spark data output
+out
+
+# ignore any data folders
+data
+
+# ignore local un-managed libs
+lib
+lib_managed
+
+# Mac
+.DS_Store
+
+# all ms temp crap
+~$*
