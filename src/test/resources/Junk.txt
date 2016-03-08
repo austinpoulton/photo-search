@@ -1,0 +1,46 @@
+package co.semanticiris.model
+
+///**
+//  * Created by austin on 04/03/2016.
+//  */
+//trait TermFilter {
+//  def filter(terms : List[String]) : List[String]
+//}
+//
+///**
+//  * As the name implies, does not filter
+//  */
+//class DoNothingFilter extends TermFilter {
+//  override def filter(terms: List[String]): List[String] = terms
+//}
+//
+///**
+//  * Simple stop word filter
+//  */
+//class SimpleStopWordFilter extends TermFilter {
+//
+//  val stopWords : Set[String] = Set("a", "the", "into", "is", "in", "it", "an", "on", "of")
+//  //val punctuation : Set[String] = Set(",",";",".","'","\"","!","?")
+//
+//  def isStopWord(token : String) = if (stopWords(token)) false else true
+//
+//  override def filter(terms: List[String]): List[String] = terms.filter(t => isStopWord(t))
+//}
+
+object CaptionUtils {
+
+
+  implicit class TermFilter (c: Caption) {
+
+    val stopWords : Set[String] = Set("a", "the", "into", "is", "in", "it", "an", "on", "of")
+
+    def filterStopWords() = {
+      new Caption(c.photoId,c.captionId,c.words.filter((w=> stopWords(w)==None)))
+    }
+  }
+
+//  def apply(filterType : String = "DoNothingFilter"): TermFilter = filterType match {
+//    case "StopWord" => new SimpleStopWordFilter()
+//      _ => new DoNothingFilter
+//  }
+}

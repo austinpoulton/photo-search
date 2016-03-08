@@ -8,6 +8,7 @@ object Version {
   val es         = "2.1.1"
   val nlp        = "3.6.0"
   val flickr     = "2.15"
+  val solr       = ""
   //val sparkTest  = "1.3.0_0.2.0"
 }
 

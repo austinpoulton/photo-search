@@ -1,0 +1,1 @@
+Copy the Flickr8k image jpg files in this folder.

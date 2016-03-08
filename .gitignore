@@ -30,5 +30,12 @@ lib_managed
 # Mac
 .DS_Store
 
+# all media
+*.jpeg
+*.jpg
+*.png
+*.gif
+
+
 # all ms temp crap
 ~$*
