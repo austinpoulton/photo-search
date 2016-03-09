@@ -23,7 +23,7 @@ class Caption(val photoId: String, val captionId : Int, val words: List[String])
     */
   def termFreq(): List[(String,Int)] = {
     // use foldLeft to traverse list adding/updating a hash map of word frequencies
-    val wordMap = words.foldLeft(new HashMap[String,Int]) { (tm, w) => if (tm.get(w) == None) tm + (w->1) else tm + (w-> (tm(w)+1)) }
+    val wordMap = words.foldLeft(new HashMap[String,Int]) { (tm, w) => if (tm.get(w)==None) tm + (w->1) else tm + (w-> (tm(w)+1)) }
     wordMap.toList
   }
 
@@ -64,7 +64,7 @@ object Caption {
 
   implicit class TermFilter(c: Caption) {
 
-    val stopWords: Set[String] = Set("a", "the", "into", "is", "in", "it", "an", "on", "of")
+    val stopWords: Set[String] = Set("a", "the", "into", "is", "in", "it", "an", "on", "of", "with")
 
     def filterStopWords() = {
       new Caption(c.photoId, c.captionId, c.words.filter(w => !stopWords(w)))
