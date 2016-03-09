@@ -49,6 +49,7 @@ class ImageDocument (val photoId : String, val  captions : Map[Int,Caption]) {
     ImageDocument(photoId, caption :: captions.values.toList)
   }
 
+  override def toString(): String = "Photo Id: "+photoId + " terms:\n" + termFrequencyMap
 }
 
 object ImageDocument {
