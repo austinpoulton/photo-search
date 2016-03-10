@@ -4,7 +4,7 @@ object Version {
   val mockito    = "1.10.19"
   val scala      = "2.10.5"
   val scalaTest  = "2.2.4"
-  val lucence    = "4.0.0"
+  val lucence    = "5.5.0"
   val es         = "2.1.1"
   val nlp        = "3.6.0"
   val flickr     = "2.15"
@@ -31,7 +31,9 @@ object Dependencies {
 
   val projectDeps = Seq(
     luceneCore,
-    esCore,
+    luceneAnalyzer,
+    luceneQuery,
+    // esCore,
     nlpCore,
     scalaTest      % "test",
     mockitoAll     % "test"
