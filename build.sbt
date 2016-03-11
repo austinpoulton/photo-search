@@ -10,3 +10,5 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Dependencies.projectDeps
+
+unmanagedBase := baseDirectory.value / "custom_lib"
