@@ -20,11 +20,16 @@ class ImageDocument (val photoId : String, val  captions : Map[Int,Caption]) {
   /**
     * @return a map of term frequencies
     */
-  def termFrequencyMap():Map[String,Int] = {
+  def termFrequencyMap(): Map[String,Int] = {
     val allWords = captions.values.toList.flatMap(c => c.words)
     val wordMap = allWords.foldLeft(new HashMap[String,Int]) { (tm, w) => if (tm.get(w) == None) tm + (w->1) else tm + (w-> (tm(w)+1)) }
     wordMap
   }
+
+  def length():Int = termFrequencyMap().values.sum
+
+  def rawLength():Int = captions.values.foldLeft(0)((s,c)=> s+ c.length() )
+
 
 
   /**

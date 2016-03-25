@@ -19,5 +19,6 @@ class CaptionLoaderSpec extends FlatSpec  {
     println("image document map: "+imgDocMap.size)
     // assert we have got the full 8k img documents in the map
     assert(imgDocMap.size == 8092)
+
   }
 }
