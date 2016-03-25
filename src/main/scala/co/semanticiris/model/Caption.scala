@@ -62,13 +62,30 @@ object Caption {
     }
   }
 
+  def toDouble(s: String): Option[Double] = {
+    try {
+      Some(s.toDouble)
+    } catch {
+      case e: NumberFormatException => None
+    }
+  }
+
+
   implicit class TermFilter(c: Caption) {
 
-    val stopWords: Set[String] = Set("a", "the", "into", "is", "in", "it", "an", "on", "of", "with")
+    val stopWords: Set[String] = Set("a", "the", "into", "is", "in", "it", "its", "an", "on", "of", "with", "he", "she", "her","hers", "his", "there", "at",
+                                     "and", "are","to", "by", "up", "for","as", "or", "no")
 
     def filterStopWords() = {
       new Caption(c.photoId, c.captionId, c.words.filter(w => !stopWords(w)))
     }
 
+    def filterNumbers() = {
+      new Caption(c.photoId,c.captionId, c.words.filter(w => !isNumeric(w)))
+    }
+
+    def isNumeric(s : String) : Boolean = {
+      toInt(s) != None || toDouble(s) != None
+    }
   }
 }

@@ -31,7 +31,9 @@ class TermEntry(val term : String, val entry: Map[String, Int]) {
   def documentListWithCounts(): List[(String, Int)] = entry.toList
 
 
-  override def toString():String = "["+term+"]\t\t"+entry
+  override def toString():String = term+", " + termFrequency()+", "+ documentFrequency()+", "+ (entry.keys.toList.map(doc=> doc+" : "+entry(doc))).mkString(" ; ")
+
+  def statsString():String = term + ", " + termFrequency()+", "+ documentFrequency()
 
 
   def + (te : TermEntry) : TermEntry = {

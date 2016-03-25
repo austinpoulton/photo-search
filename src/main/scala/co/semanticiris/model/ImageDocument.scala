@@ -15,7 +15,8 @@ class ImageDocument (val photoId : String, val  captions : Map[Int,Caption]) {
 
   require(captions.values.map(c => c.photoId  == photoId).reduce((x,y) => x && y ))
 
-  final val IMAGE_DESC : String = "IMAGE_DESC"
+  final val CAPTIONS : String = "IMAGE_CAPTIONS"
+  final val UNIQUE_TERMS : String = "UNIQUE_TERMS"
 
   /**
     * @return a map of term frequencies
@@ -25,6 +26,8 @@ class ImageDocument (val photoId : String, val  captions : Map[Int,Caption]) {
     val wordMap = allWords.foldLeft(new HashMap[String,Int]) { (tm, w) => if (tm.get(w) == None) tm + (w->1) else tm + (w-> (tm(w)+1)) }
     wordMap
   }
+
+  def uniqueTerms():Int = termFrequencyMap().size
 
   def length():Int = termFrequencyMap().values.sum
 
@@ -38,8 +41,10 @@ class ImageDocument (val photoId : String, val  captions : Map[Int,Caption]) {
   def document(): Document = {
     val textList = for (c <- captions.values) yield c.words.mkString(" ")
     val doc : Document = new Document()
-    val field : Field = new Field(IMAGE_DESC, textList.mkString(" "),TextField.TYPE_STORED )
-    doc.add(field)
+    val capsField : Field = new Field(CAPTIONS, textList.mkString(" "),TextField.TYPE_STORED )
+    val uniqueTermsField : Field = new Field(UNIQUE_TERMS, termFrequencyMap().keys.toList.mkString(" "), TextField.TYPE_STORED)
+    doc.add(capsField)
+    doc.add(uniqueTermsField)
     doc
   }
 

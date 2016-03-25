@@ -1,5 +1,6 @@
-import co.semanticiris.model.TermEntry
+import co.semanticiris.model.{Caption, ImageCollection, ImageDocument, TermEntry}
 import org.apache.lucene.document.Document
+
 import scala.collection.immutable.HashMap
 
 val ar : Array[String] = Array("bob", "ch", "12", "ch")
@@ -13,7 +14,16 @@ val t = s.replaceAll("""[\p{Punct}]""", "")
 
 
 val te : TermEntry = TermEntry("dog", "pic1",2)+TermEntry("dog","pic2",3)+TermEntry("dog","pic3",3)
-val t12 = TermEntry("bo1o", "eqwewq", 3) + TermEntry ("boo", "blaa", 2)
+val t12 = TermEntry("boo", "eqwewq", 3) + TermEntry ("boo", "blaa", 2)
 
-te.documentFrequency()
-t12.termFrequency()
+val cap = new Caption("photo1", 1, List("dog","man","sky", "sky", "blue", "man"))
+val idoc = ImageDocument(cap.photoId,cap)
+
+val tes = TermEntry(idoc)
+
+var coll = new ImageCollection
+coll = coll + idoc
+coll.termCount()
+coll.documentCount()
+
+
