@@ -1,6 +1,13 @@
 package co.semanticiris.model
 
 //import scala.collection.immutable.HashMap
+import java.io.{FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutputStream}
+
+import org.apache.lucene.analysis.Analyzer
+import org.apache.lucene.analysis.standard.StandardAnalyzer
+import org.apache.lucene.index.{IndexWriter, IndexWriterConfig}
+import org.apache.lucene.store.{Directory, RAMDirectory}
+
 import scala.collection.immutable.HashMap
 import scala.collection.mutable
 
@@ -8,7 +15,7 @@ import scala.collection.mutable
 /**
   * Created by austin on 23/03/2016.
   */
-class ImageCollection {
+class ImageCollection extends Serializable {
   var termDocMat : mutable.Map[String,TermEntry] = new mutable.HashMap[String, TermEntry]()
   var docs : mutable.Map[String, ImageDocument] = new mutable.HashMap[String, ImageDocument]()
 
@@ -34,6 +41,21 @@ class ImageCollection {
   def minString():String = "Term, Term Count, Document Count\n"+ (termDocMat.values.toList.map(t => t.statsString())).mkString("\n")
 
   def documentString():String = "PhotoId, Doc Length, Unique Terms\n" + (docs.values.toList.map(d => d.photoId + ","+d.length()+","+d.uniqueTerms())).mkString("\n")
+
+  def directory():Directory = {
+    val analyzer : Analyzer = new StandardAnalyzer()
+    // RAM (in-memory) directory
+    val directory : Directory  = new RAMDirectory()
+    val config : IndexWriterConfig = new IndexWriterConfig(analyzer)
+    // index readers
+    val iwriter : IndexWriter  = new IndexWriter(directory,config)
+
+    for (idoc <- docs.values.toList) {
+      iwriter.addDocument(idoc.document())
+    }
+    iwriter.close()
+    directory
+  }
 }
 
 object ImageCollection {
@@ -57,50 +79,20 @@ object ImageCollection {
     println("image document map: "+photoDocMap.size)
     apply(photoDocMap)
   }
+
+
+  def save(iColl: ImageCollection, location : String):Unit = {
+
+    val oos = new ObjectOutputStream(new FileOutputStream(location))
+    oos.writeObject(iColl)
+    oos.close
+  }
+
+  def load(location: String):ImageCollection = {
+    val ois = new ObjectInputStream(new FileInputStream(location))
+    val iColl = ois.readObject.asInstanceOf[ImageCollection]
+    ois.close
+    iColl
+  }
+
 }
-
-
-//class TermDocumentMatrix(val matrix: Map[String,TermEntry]) {
-//
-//  //var table : Map[String, TermDocumentMatrix] = ???
-//
-//  def size():Int = matrix.size
-//
-//  def + (termEntry : TermEntry): TermDocumentMatrix = ???
-//
-//  //  def + (imgDoc : ImageDocument): TermDocumentMatrix = {
-//  //
-//  //    val x = imgDoc.termFrequencyMap.foldLeft(matrix) { (matrix, t) =>
-//  //      if (matrix.get(t._1) == None)
-//  //        matrix + (t._1 -> TermEntry(t._1, imgDoc.photoId, t._2))
-//  //      else
-//  //
-//  //
-//  //
-//  //    }
-//  //  }
-//
-//  def addImageDoc(idoc : ImageDocument) : TermDocumentMatrix = ???
-//
-//
-//}
-//
-//object TermDocumentMatrix {
-//
-//
-//  def pivot(termDocMat : HashMap[String, TermEntry], docTuple :(String, ImageDocument)): HashMap[String, TermEntry] = {
-//    val termMap = docTuple._2.termFrequencyMap()
-//    termMap.toList.foldLeft(termDocMat) = { (tdMap, termFreqTuple) =>
-//
-//    }
-//  }
-//
-//
-//  def apply(imgDocMap : Map[String, ImageDocument]): TermDocumentMatrix = {
-//
-//    val tdMat = imgDocMap.foldLeft(new HashMap[String, TermEntry]) { (termMap, docTuple) =>
-//      val termMap = docTuple._2.termFrequencyMap()
-//
-//    }
-//  }
-//}

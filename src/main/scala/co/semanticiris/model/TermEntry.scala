@@ -8,7 +8,7 @@ import scala.collection.immutable.HashMap
   * @param term the word
   * @param entry a map of documents -> term occurances
   */
-class TermEntry(val term : String, val entry: Map[String, Int]) {
+class TermEntry(val term : String, val entry: Map[String, Int]) extends Serializable {
 
   /**
     * @return the number of documents this term appears in

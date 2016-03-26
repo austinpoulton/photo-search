@@ -14,7 +14,7 @@ import scala.collection.immutable.HashMap
   * @param captionId 0..4
   * @param words List of caption words, raw no stop word/entity/stemming  filtering
   */
-class Caption(val photoId: String, val captionId : Int, val words: List[String]) {
+class Caption(val photoId: String, val captionId : Int, val words: List[String]) extends Serializable {
 
   /**
     * Returns the term frequency for this caption

@@ -24,4 +24,13 @@ object ImageCollectionDemo extends  App {
   Some(new PrintWriter("/Users/austin/DATA/flickrTerms.csv")).foreach{p => p.write(imgCollection.minString()); p.close}
 
   Some(new PrintWriter("/Users/austin/DATA/flickrDocs.csv")).foreach{p => p.write(imgCollection.documentString()); p.close}
+
+
+  val ramDir = imgCollection.directory()
+  val docs =  ramDir.listAll()
+  println("# indexed docs: "+docs.length)
+  println("indexed = "+docs.mkString(", "))
+
+  ImageCollection.save(imgCollection,"/Users/austin/DATA/flickrImageColl.ser")
+
 }

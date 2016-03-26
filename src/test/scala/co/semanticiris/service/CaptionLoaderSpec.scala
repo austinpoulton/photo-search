@@ -18,7 +18,7 @@ class CaptionLoaderSpec extends FlatSpec  {
     val imgDocMap = captionLoader.loadCaptions()
     println("image document map: "+imgDocMap.size)
     // assert we have got the full 8k img documents in the map
-    assert(imgDocMap.size == 8092)
+    assert(imgDocMap.size == 8093)
 
   }
 }

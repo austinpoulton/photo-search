@@ -11,7 +11,7 @@ import scala.collection.immutable.HashMap
   * @param captions
   */
 
-class ImageDocument (val photoId : String, val  captions : Map[Int,Caption]) {
+class ImageDocument (val photoId : String, val  captions : Map[Int,Caption]) extends Serializable {
 
   require(captions.values.map(c => c.photoId  == photoId).reduce((x,y) => x && y ))
 

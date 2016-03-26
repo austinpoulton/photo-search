@@ -40458,3 +40458,9 @@
 997722733_0cb5439472.jpg#2	A person in a red shirt climbing up a rock face covered in assist handles .
 997722733_0cb5439472.jpg#3	A rock climber in a red shirt .
 997722733_0cb5439472.jpg#4	A rock climber practices on a rock climbing wall .
+anna.jpg#1			Anna sleeping during lectures
+anna.jpg#2			Ian, a studious man, looks engaged and interested during the lecture
+anna.jpg#3			A very tired girl sleeping during lectures whilst a studious man looks on
+anna.jpg#4			A girl sleeps during a lecture whilst a very engaged and studious man looks on 
+
+
