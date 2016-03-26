@@ -49,7 +49,7 @@ class TermEntry(val term : String, val entry: Map[String, Int]) extends Serializ
 }
 
 
-object TermEntry {
+object TermEntry extends Serializable {
 
   def apply(term: String, docId : String, freq: Int):TermEntry = new TermEntry(term, Map(docId -> freq))
   def apply(term: String, docFreq : Map[String, Int]) = new TermEntry(term, docFreq)

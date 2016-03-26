@@ -33,7 +33,7 @@ class Caption(val photoId: String, val captionId : Int, val words: List[String])
 }
 
 
-object Caption {
+object Caption extends Serializable {
 
   def apply(captionStr: String): Option[Caption] = {
     val components = captionStr.split("\\s+") // split on all whitespace

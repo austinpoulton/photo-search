@@ -62,7 +62,7 @@ class ImageDocument (val photoId : String, val  captions : Map[Int,Caption]) ext
   override def toString(): String = "Photo Id: "+photoId + " terms:\n" + termFrequencyMap
 }
 
-object ImageDocument {
+object ImageDocument extends Serializable{
 
   def apply(photoId: String, captions : List[Caption]):ImageDocument = {
     new ImageDocument(photoId,captions.map(c=> (c.captionId, c)).toMap)
