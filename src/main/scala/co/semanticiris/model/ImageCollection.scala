@@ -80,9 +80,7 @@ object ImageCollection {
     apply(photoDocMap)
   }
 
-
   def save(iColl: ImageCollection, location : String):Unit = {
-
     val oos = new ObjectOutputStream(new FileOutputStream(location))
     oos.writeObject(iColl)
     oos.close
@@ -94,5 +92,4 @@ object ImageCollection {
     ois.close
     iColl
   }
-
 }

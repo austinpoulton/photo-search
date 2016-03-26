@@ -19,11 +19,11 @@ object ImageCollectionDemo extends  App {
 
   println(" avg docs length: "+imgCollection.meanDocumentLength())
 
-  Some(new PrintWriter("/Users/austin/DATA/flickrTermsDocTable.csv")).foreach{p => p.write(imgCollection.toString()); p.close}
+  Some(new PrintWriter("/var/irdata/flickrTermsDocTable.csv")).foreach{p => p.write(imgCollection.toString()); p.close}
 
-  Some(new PrintWriter("/Users/austin/DATA/flickrTerms.csv")).foreach{p => p.write(imgCollection.minString()); p.close}
+  Some(new PrintWriter("/var/irdata/flickrTerms.csv")).foreach{p => p.write(imgCollection.minString()); p.close}
 
-  Some(new PrintWriter("/Users/austin/DATA/flickrDocs.csv")).foreach{p => p.write(imgCollection.documentString()); p.close}
+  Some(new PrintWriter("/var/irdata/flickrDocs.csv")).foreach{p => p.write(imgCollection.documentString()); p.close}
 
 
   val ramDir = imgCollection.directory()
@@ -31,6 +31,6 @@ object ImageCollectionDemo extends  App {
   println("# indexed docs: "+docs.length)
   println("indexed = "+docs.mkString(", "))
 
-  ImageCollection.save(imgCollection,"/Users/austin/DATA/flickrImageColl.ser")
+  ImageCollection.save(imgCollection,"/var/irdata/flickrImageColl.ser")
 
 }
