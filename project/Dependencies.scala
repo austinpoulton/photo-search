@@ -20,6 +20,7 @@ object Library {
   val luceneCore      = "org.apache.lucene"  % "lucene-core"  % Version.lucence
   val luceneAnalyzer  = "org.apache.lucene"  % "lucene-analyzers-common"  % Version.lucence
   val luceneQuery     = "org.apache.lucene"  % "lucene-queryparser"  % Version.lucence
+  val luceneBenchmark = "org.apache.lucene"  % "lucene-benchmark" % Version.lucence
   val esCore          = "org.elasticsearch" % "elasticsearch" %  Version.es
   val nlpCore         = "edu.stanford.nlp" % "stanford-corenlp" % Version.nlp
   val flickr4j        = "com.flickr4java" % "flickr4java" % Version.flickr
@@ -33,6 +34,7 @@ object Dependencies {
     luceneCore,
     luceneAnalyzer,
     luceneQuery,
+    luceneBenchmark,
     // esCore,
     nlpCore,
     scalaTest      % "test",

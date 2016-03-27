@@ -14,7 +14,7 @@ import scala.collection.immutable.HashMap
   * @param captionId 0..4
   * @param words List of caption words, raw no stop word/entity/stemming  filtering
   */
-class Caption(val photoId: String, val captionId : Int, val words: List[String]) extends Serializable {
+class Caption(val photoId: String, val captionId : Int, val words: List[String]) extends Serializable with TermOperations {
 
   /**
     * Returns the term frequency for this caption
@@ -30,10 +30,19 @@ class Caption(val photoId: String, val captionId : Int, val words: List[String])
   def length():Int = words.length
 
   override def toString():String = "\nCaption for photoID: "+photoId+" caption id: "+captionId+" with tokens: "+words.mkString(",")
+
+
+  def filterStopWords() = {
+    new Caption(photoId, captionId, words.filter(w => !isStopWord(w)))
+  }
+
+  def filterNumbers() = {
+    new Caption(photoId, captionId, words.filter(w => !isNumeric(w)))
+  }
 }
 
 
-object Caption extends Serializable {
+object Caption extends Serializable with TermOperations {
 
   def apply(captionStr: String): Option[Caption] = {
     val components = captionStr.split("\\s+") // split on all whitespace
@@ -54,38 +63,21 @@ object Caption extends Serializable {
     Some(c)
   }
 
-  def toInt(s: String): Option[Int] = {
-    try {
-      Some(s.toInt)
-    } catch {
-      case e: NumberFormatException => None
-    }
-  }
-
-  def toDouble(s: String): Option[Double] = {
-    try {
-      Some(s.toDouble)
-    } catch {
-      case e: NumberFormatException => None
-    }
-  }
 
 
-  implicit class TermFilter(c: Caption) {
 
-    val stopWords: Set[String] = Set("a", "the", "into", "is", "in", "it", "its", "an", "on", "of", "with", "he", "she", "her","hers", "his", "there", "at",
-                                     "and", "are","to", "by", "up", "for","as", "or", "no")
-
-    def filterStopWords() = {
-      new Caption(c.photoId, c.captionId, c.words.filter(w => !stopWords(w)))
-    }
-
-    def filterNumbers() = {
-      new Caption(c.photoId,c.captionId, c.words.filter(w => !isNumeric(w)))
-    }
-
-    def isNumeric(s : String) : Boolean = {
-      toInt(s) != None || toDouble(s) != None
-    }
-  }
+//  implicit class TermFilter(c: Caption) {
+//
+//    val stopWords: Set[String] = Set("a", "the", "into", "is", "in", "it", "its", "an", "on", "of", "with", "he", "she", "her","hers", "his", "there", "at",
+//                                     "and", "are","to", "by", "up", "for","as", "or", "no")
+//
+//    def isStopWord(word : String) :Boolean = {
+//      stopWords(word)
+//    }
+//
+//    def isNumeric(s : String) : Boolean = {
+//      toInt(s) != None || toDouble(s) != None
+//    }
+//
+//  }
 }

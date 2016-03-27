@@ -15,9 +15,6 @@ class ImageDocument (val photoId : String, val  captions : Map[Int,Caption]) ext
 
   require(captions.values.map(c => c.photoId  == photoId).reduce((x,y) => x && y ))
 
-  final val CAPTIONS : String = "IMAGE_CAPTIONS"
-  final val UNIQUE_TERMS : String = "UNIQUE_TERMS"
-
   /**
     * @return a map of term frequencies
     */
@@ -41,10 +38,13 @@ class ImageDocument (val photoId : String, val  captions : Map[Int,Caption]) ext
   def document(): Document = {
     val textList = for (c <- captions.values) yield c.words.mkString(" ")
     val doc : Document = new Document()
-    val capsField : Field = new Field(CAPTIONS, textList.mkString(" "),TextField.TYPE_STORED )
-    val uniqueTermsField : Field = new Field(UNIQUE_TERMS, termFrequencyMap().keys.toList.mkString(" "), TextField.TYPE_STORED)
+
+    val capsField : Field = new Field(ImageDocument.CAPTIONS, textList.mkString(" "),TextField.TYPE_STORED )
+    val uniqueTermsField : Field = new Field(ImageDocument.UNIQUE_TERMS, termFrequencyMap().keys.toList.mkString(" "), TextField.TYPE_STORED)
+    val imageIdField : Field = new Field(ImageDocument.IMAGE_ID, photoId, TextField.TYPE_STORED)
     doc.add(capsField)
     doc.add(uniqueTermsField)
+    doc.add(imageIdField)
     doc
   }
 
@@ -63,6 +63,11 @@ class ImageDocument (val photoId : String, val  captions : Map[Int,Caption]) ext
 }
 
 object ImageDocument extends Serializable{
+
+
+  final val CAPTIONS : String = "IMAGE_CAPTIONS"
+  final val UNIQUE_TERMS : String = "UNIQUE_TERMS"
+  final val IMAGE_ID : String = "IMAGE_ID"
 
   def apply(photoId: String, captions : List[Caption]):ImageDocument = {
     new ImageDocument(photoId,captions.map(c=> (c.captionId, c)).toMap)

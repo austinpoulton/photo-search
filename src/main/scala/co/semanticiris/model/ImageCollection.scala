@@ -1,6 +1,5 @@
 package co.semanticiris.model
 
-//import scala.collection.immutable.HashMap
 import java.io.{FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutputStream}
 
 import org.apache.lucene.analysis.Analyzer
@@ -8,14 +7,16 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer
 import org.apache.lucene.index.{IndexWriter, IndexWriterConfig}
 import org.apache.lucene.store.{Directory, RAMDirectory}
 
-import scala.collection.immutable.HashMap
+import scala.collection.immutable.{HashMap, HashSet}
 import scala.collection.mutable
 
 
 /**
   * Created by austin on 23/03/2016.
+  *
   */
-class ImageCollection extends Serializable {
+class ImageCollection extends Serializable with TermOperations {
+
   var termDocMat : mutable.Map[String,TermEntry] = new mutable.HashMap[String, TermEntry]()
   var docs : mutable.Map[String, ImageDocument] = new mutable.HashMap[String, ImageDocument]()
 
@@ -27,13 +28,39 @@ class ImageCollection extends Serializable {
     this
   }
 
+
   def termCount():Int = termDocMat.keys.size
 
   def documentCount(): Int = docs.keys.size
 
   def meanDocumentLength() :Int = docs.values.map(d => d.length()).sum/docs.values.size
 
-  //def get(term : String):Option[TermEntry] = termDocMat(term)
+
+  /**
+    * find all matching term entries - Assumes conjuection logic only
+    * @param query
+    * @return
+    */
+  def findTerms(query : String):Option[Set[TermEntry]] = {
+    // split into tokens and filter out punctation and stopwords and numbers
+    val words = tokenize(query)
+//      query.split("\\s").toList.map(s => s.replaceAll("""[\p{Punct}]""", "")).filter(s => s != "").
+//      filter(s => !isStopWord(s)).filter(s => !isNumeric(s))
+    if (words.length > 0) Some(words.foldLeft(new HashSet[TermEntry]()) { (hs, w) => val te = termDocMat.get(w); if (te != None) (hs + te.get) else hs })
+    else None
+  }
+
+  def findDocuments(query : String): Option[Set[ImageDocument]] = {
+    val termOpt = findTerms(query)
+    if (termOpt.get != None)
+      Some(termOpt.get.toList.foldLeft(new HashSet[ImageDocument]()) {(hs, te) => te.entry.keys.toList.foldLeft(hs) ((hs, imgId) => hs + (docs.get(imgId).get))})
+    else None
+  }
+
+  //def findDoucments(query: String): Option[Map[String]]
+
+
+
 
   // convenient
   override def toString():String = "Term, Term Count, Document Count, Documents\n"+ (termDocMat.values.toList.map(t => t.toString())).mkString("\n")
