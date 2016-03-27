@@ -1,4 +1,4 @@
-package co.semanticiris.experiments
+package co.semanticiris.tools
 
 import org.apache.lucene.analysis.Analyzer
 import org.apache.lucene.analysis.standard.StandardAnalyzer

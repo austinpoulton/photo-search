@@ -9,31 +9,33 @@ import scala.io.Source
 class CaptionSpec extends FlatSpec with BeforeAndAfter {
 
   /** test fixtures */
-  final val captionWithSpaces       = "1000268201_693b08cb0e.jpg#0	A child in a pink dress is climbing up a set of stairs in an entry way ."
-  final val captionWithTabAndSpaces = "1000268201_693b08cb0e.jpg#0\tA child \tin a pink dress is climbing up a set of stairs in an entry way ."
-  final val capStr3                 = "101654506_8eb26cfb60.jpg#4\tA dog is running in the snow"
+  final val validCaption1WithTab     = "1000268201_693b08cb0e.jpg#0\tA child in a pink dress is climbing up a set of stairs in an entry way ."
+  final val validCaption1WithTabs    = "1000268201_693b08cb0e.jpg#0\t\tA child in a pink dress is climbing up a set of stairs in an entry way ."
+  final val validCaption2WithTab     = "101654506_8eb26cfb60.jpg#4\tA dog is running in the snow"
   final val corruptCaption1         = "3231211#@ \t"
   final val corruptCaption2         = "\t#\t"
+  final val caption1                = "1007320043_627395c3d8.jpg#0\tA child playing on a rope net "
+
 
 
   "A Caption " should "parse caption text with spaces" in {
-    val capOpt = Caption(captionWithSpaces)
+    val capOpt = Caption(validCaption1WithTab)
     assert(capOpt != None)
     val c = capOpt.get
     println(c)
     assert(c.photoId == "1000268201_693b08cb0e.jpg")
     assert(c.captionId == 0)
-    assert(c.words.length == 17)
+    assert(c.words.length == 8)
   }
 
   it should "parse caption text with tabs and spaces" in {
-    val capOpt = Caption(captionWithTabAndSpaces)
+    val capOpt = Caption(validCaption1WithTabs)
     assert(capOpt != None)
     val c = capOpt.get
     println(c)
     assert(c.photoId == "1000268201_693b08cb0e.jpg")
     assert(c.captionId == 0)
-    assert(c.words.length == 17)
+    assert(c.words.length == 8)
   }
 
   it should "fail to parse corrupted caption text" in {
@@ -42,7 +44,7 @@ class CaptionSpec extends FlatSpec with BeforeAndAfter {
   }
 
   it should "filter out simple stopwords" in {
-    val capOpt = Caption(capStr3)
+    val capOpt = Caption(validCaption2WithTab)
     val c = capOpt.get.filterStopWords()
     println(c)
     assert(c.words.length == 3)

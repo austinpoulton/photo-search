@@ -1,11 +1,13 @@
 package co.semanticiris.model
 
 import java.io.{FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutputStream}
+import java.nio.file.{Path, Paths}
 
 import org.apache.lucene.analysis.Analyzer
+import org.apache.lucene.analysis.en.EnglishAnalyzer
 import org.apache.lucene.analysis.standard.StandardAnalyzer
 import org.apache.lucene.index.{IndexWriter, IndexWriterConfig}
-import org.apache.lucene.store.{Directory, RAMDirectory}
+import org.apache.lucene.store._
 
 import scala.collection.immutable.{HashMap, HashSet}
 import scala.collection.mutable
@@ -37,7 +39,7 @@ class ImageCollection extends Serializable with TermOperations {
 
 
   /**
-    * find all matching term entries - Assumes conjuection logic only
+    * find all matching term entries - Assumes conjunction logic only
     * @param query
     * @return
     */
@@ -57,26 +59,48 @@ class ImageCollection extends Serializable with TermOperations {
     else None
   }
 
-  //def findDoucments(query: String): Option[Map[String]]
-
-
-
-
-  // convenient
-  override def toString():String = "Term, Term Count, Document Count, Documents\n"+ (termDocMat.values.toList.map(t => t.toString())).mkString("\n")
+  def inverseIndexString():String = "Term, Term Count, Document Count, Documents\n"+ (termDocMat.values.toList.map(t => t.toString())).mkString("\n")
 
   def minString():String = "Term, Term Count, Document Count\n"+ (termDocMat.values.toList.map(t => t.statsString())).mkString("\n")
 
   def documentString():String = "PhotoId, Doc Length, Unique Terms\n" + (docs.values.toList.map(d => d.photoId + ","+d.length()+","+d.uniqueTerms())).mkString("\n")
 
+
+
+  /// directory methods
+
+  def stemmedDirectory = {
+    val analyzer : EnglishAnalyzer = new EnglishAnalyzer()
+    createDirectory(analyzer)
+  }
+
   def directory():Directory = {
     val analyzer : Analyzer = new StandardAnalyzer()
-    // RAM (in-memory) directory
-    val directory : Directory  = new RAMDirectory()
+    createDirectory(analyzer)
+  }
+
+  def createDirectory(analyzer : Analyzer): RAMDirectory = {
+    val directory : RAMDirectory  = new RAMDirectory()
     val config : IndexWriterConfig = new IndexWriterConfig(analyzer)
     // index readers
     val iwriter : IndexWriter  = new IndexWriter(directory,config)
+    for (idoc <- docs.values.toList) {
+      iwriter.addDocument(idoc.document())
+    }
+    iwriter.close()
+    directory
+  }
 
+  def directory(isStemmed : Boolean, isPersistent : Boolean, persistentDirloc : String = "/var/irdata/indexes/directory"): Directory = {
+    val directory = if (isPersistent) FSDirectory.open(Paths.get(persistentDirloc)) else new RAMDirectory()
+    val analyzer = if (isStemmed)  new EnglishAnalyzer() else new StandardAnalyzer()
+    indexDocuments(directory,analyzer)
+  }
+
+  def indexDocuments(directory : Directory, analyzer: Analyzer):Directory = {
+    val config : IndexWriterConfig = new IndexWriterConfig(analyzer)
+    // index readers
+    val iwriter : IndexWriter  = new IndexWriter(directory,config)
     for (idoc <- docs.values.toList) {
       iwriter.addDocument(idoc.document())
     }

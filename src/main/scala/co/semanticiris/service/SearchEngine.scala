@@ -15,12 +15,12 @@ import scala.collection.immutable.HashMap
 /**
   * Created by austin on 26/03/2016.
   */
-class SearchEngine(val directory : RAMDirectory, val similarity : Similarity, val maxResults : Int) {
+class SearchEngine(val directory : RAMDirectory, val similarity : Similarity, val analyzer: Analyzer, val maxResults : Int) {
 
 
   def search(searchStrs : Array[String]) : Unit = {
     val analyzer : Analyzer = new StandardAnalyzer()
-    val qp = new QueryParser(ImageDocument.CAPTIONS, analyzer)
+    val qp = new QueryParser(ImageDocument.IMAGE_CAPTIONS, analyzer)
     val queries : Array[Query] = searchStrs.map(s => qp.parse(s))
     search(queries)
   }
@@ -38,6 +38,9 @@ class SearchEngine(val directory : RAMDirectory, val similarity : Similarity, va
     ireader.close()
     results
   }
+
+  def benchmarkSearch():Unit = ???
+
 }
 
 class ResultEntry(val totalHits : Int, results : List[SearchResult])

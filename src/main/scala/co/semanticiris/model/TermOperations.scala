@@ -1,5 +1,8 @@
 package co.semanticiris.model
 
+import org.tartarus.snowball.ext.PorterStemmer
+
+
 /**
   * Created by austin on 26/03/2016.
   */
@@ -19,6 +22,7 @@ trait TermOperations {
   def tokenize(data : String): List[String] = data.split("\\s").toList.map(s => s.replaceAll("""[\p{Punct}]""", ""))
     .filter(s => s != "").filter(s => !isStopWord(s)).filter(s => !isNumeric(s))
 
+
   def toInt(s: String): Option[Int] = {
     try {
       Some(s.toInt)
@@ -34,4 +38,11 @@ trait TermOperations {
       case e: NumberFormatException => None
     }
   }
+}
+
+object TermOperations {
+
+  //val porterFilter = new PorterStemmer()
+
+  //def stem(token : String):String = porterFilter.stem()
 }

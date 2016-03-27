@@ -7,10 +7,10 @@ import org.scalatest.FlatSpec
   */
 class ImageDocumentSpec extends FlatSpec {
 
-  val caption1 = Caption("img1#0 Mad Furry Dog").get
-  val caption2 = Caption("img1#1 Angry Furry Hound").get
-  val caption3 = Caption("img1#2 Mad Hairy Dog").get
-  val caption4 = Caption("img1#3 Mad hairy light brown dog").get
+  val caption1 = Caption("img1#0\tMad Furry Dog").get
+  val caption2 = Caption("img1#1\tAngry Furry Hound").get
+  val caption3 = Caption("img1#2\tMad Hairy Dog").get
+  val caption4 = Caption("img1#3\tMad hairy light brown dog").get
 
   val captionList : List[Caption] = List (caption1, caption2, caption3, caption4)
 
@@ -19,14 +19,14 @@ class ImageDocumentSpec extends FlatSpec {
     val imageDoc = ImageDocument("img1", caption1)
     println(imageDoc)
     assert(imageDoc.captions.size == 1)
-    assert(imageDoc.termFrequencyMap().size == 3)
+    assert(imageDoc.rawTerms().size == 3)
   }
 
   it should "be created from a list of captions" in {
     val imageDoc = ImageDocument("img1", captionList)
     println(imageDoc)
     assert(imageDoc.captions.size == 4)
-    assert(imageDoc.termFrequencyMap().size == 8)
+    assert(imageDoc.rawTerms().size == 8)
   }
 
   it should "allow captions to be added to it" in {
@@ -34,7 +34,7 @@ class ImageDocumentSpec extends FlatSpec {
     val imageDoc2 = imageDoc + caption2
     println(imageDoc2)
     assert(imageDoc2.captions.size == 2)
-    assert(imageDoc2.termFrequencyMap().size == 5)
+    assert(imageDoc2.rawTerms().size == 5)
   }
 
 }

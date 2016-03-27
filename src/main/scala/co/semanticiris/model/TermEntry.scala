@@ -54,7 +54,7 @@ object TermEntry extends Serializable {
   def apply(term: String, docId : String, freq: Int):TermEntry = new TermEntry(term, Map(docId -> freq))
   def apply(term: String, docFreq : Map[String, Int]) = new TermEntry(term, docFreq)
   def apply(idoc : ImageDocument) : List[TermEntry] = {
-    val termsMap = idoc.termFrequencyMap()
+    val termsMap = idoc.rawTerms()
     termsMap.toList.map(tt => TermEntry(tt._1, idoc.photoId,tt._2) )
   }
 }

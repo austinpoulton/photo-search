@@ -1,9 +1,11 @@
 package co.semanticiris.model
 
+import java.io.StringReader
 import org.apache.lucene.document.Document
 import org.apache.lucene.document.Field
 import org.apache.lucene.document.TextField
 import scala.collection.immutable.HashMap
+import org.apache.lucene.analysis.en.PorterStemmer
 
 /**
   * This class encapsulates a image document and wraps a Lucene Document
@@ -18,29 +20,40 @@ class ImageDocument (val photoId : String, val  captions : Map[Int,Caption]) ext
   /**
     * @return a map of term frequencies
     */
-  def termFrequencyMap(): Map[String,Int] = {
+  def rawTerms(): Map[String,Int] = {
+
+//    val words = (captions.values.flatMap(c => c.text.split("\\p+").toList)).map(s => s.trim)
+//    val termMap = words.foldLeft(new HashMap[String,Int]) { (tm, w) => if (tm.get(w) == None) tm + (w->1) else tm + (w-> (tm(w)+1)) }
     val allWords = captions.values.toList.flatMap(c => c.words)
     val wordMap = allWords.foldLeft(new HashMap[String,Int]) { (tm, w) => if (tm.get(w) == None) tm + (w->1) else tm + (w-> (tm(w)+1)) }
     wordMap
   }
 
-  def uniqueTerms():Int = termFrequencyMap().size
+  /**
+    * @return term frequency map after stopword and porter stemming has been applied
+    */
+  def stemmedTerms(): Map[String, Int] = ???
+    //val docText = captions.values.map(c => c.text).mkString("\n")
+    //val tReader = new StringReader(docText
 
-  def length():Int = termFrequencyMap().values.sum
+
+  def uniqueTerms():Int = rawTerms().size
+
+  def length():Int = rawTerms().values.sum
 
   def rawLength():Int = captions.values.foldLeft(0)((s,c)=> s+ c.length() )
-
-
 
   /**
     * @return a Lucene document
     */
   def document(): Document = {
-    val textList = for (c <- captions.values) yield c.words.mkString(" ")
+    //val docText = (for (c <- captions.values) yield c.text).mkString("\n")
+    val captionTexts = for (c <- captions.values) yield c.words.mkString(" ")
     val doc : Document = new Document()
 
-    val capsField : Field = new Field(ImageDocument.CAPTIONS, textList.mkString(" "),TextField.TYPE_STORED )
-    val uniqueTermsField : Field = new Field(ImageDocument.UNIQUE_TERMS, termFrequencyMap().keys.toList.mkString(" "), TextField.TYPE_STORED)
+    val capsField : Field = new Field(ImageDocument.IMAGE_CAPTIONS, captionTexts.mkString(" ") ,TextField.TYPE_STORED )
+    // Todo - frequency map
+    val uniqueTermsField : Field = new Field(ImageDocument.UNIQUE_TERMS, rawTerms().keys.toList.mkString(" "), TextField.TYPE_STORED)
     val imageIdField : Field = new Field(ImageDocument.IMAGE_ID, photoId, TextField.TYPE_STORED)
     doc.add(capsField)
     doc.add(uniqueTermsField)
@@ -50,6 +63,7 @@ class ImageDocument (val photoId : String, val  captions : Map[Int,Caption]) ext
 
   /**
     * Add a caption to an ImageDocument
+ *
     * @param caption
     * @return a new ImageDocument
     */
@@ -59,13 +73,14 @@ class ImageDocument (val photoId : String, val  captions : Map[Int,Caption]) ext
     ImageDocument(photoId, caption :: captions.values.toList)
   }
 
-  override def toString(): String = "Photo Id: "+photoId + " terms:\n" + termFrequencyMap
+  override def toString(): String = "Photo Id: "+photoId + " terms:\n" + rawTerms
 }
 
 object ImageDocument extends Serializable{
 
 
-  final val CAPTIONS : String = "IMAGE_CAPTIONS"
+  final val IMAGE_CAPTIONS : String = "IMAGE_CAPTIONS"
+  final val CAPTION2 : String = "CAPTION2"
   final val UNIQUE_TERMS : String = "UNIQUE_TERMS"
   final val IMAGE_ID : String = "IMAGE_ID"
 

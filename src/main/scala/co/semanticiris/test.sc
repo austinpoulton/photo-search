@@ -9,7 +9,7 @@ val x = for (i <- 1 to ar.length-1) yield ar(i)
 ar.toList.foldLeft(new HashMap[String,Int]) { (z, w) => if (z.get(w) == None) z + (w->1) else z + (w-> (z(w)+1)) }
 
 
-val s = ",asss. is Ploo"
+val s = ",asss. is Ploo, and by the way; 90.23 you"
 val t = s.replaceAll("""[\p{Punct}]""", "")
 
 
@@ -26,4 +26,9 @@ coll = coll + idoc
 coll.termCount()
 coll.documentCount()
 
+val cap1 = "anna.jpg#0\t\t\tAnna sleeping during lectures"
+val components = cap1.split("\\t+") // split on all whitespace
+
+val cap2 = "997722733_0cb5439472.jpg#2\tA person in a red shirt climbing up a rock face covered in assist handles ."
+val components1 = cap2.split("\\t+") // split on all whitespace
 

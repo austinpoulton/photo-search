@@ -1,4 +1,4 @@
-package co.semanticiris.experiments
+package co.semanticiris.tools
 
 import co.semanticiris.model.{ImageCollection, ImageDocument}
 import org.apache.lucene.analysis.Analyzer
@@ -11,7 +11,7 @@ import org.apache.lucene.store.RAMDirectory
 /**
   * Created by austin on 26/03/2016.
   */
-object ImageIndexingDemo extends App {
+object ImageCollectionSearchDemo extends App {
 
   val analyzer : Analyzer = new StandardAnalyzer()
   val imgCollection = ImageCollection.load("/var/irdata/flickrImageColl.ser")
@@ -25,7 +25,7 @@ object ImageIndexingDemo extends App {
   val ireader : DirectoryReader = DirectoryReader.open(directory)
   val isearcher  = new IndexSearcher(ireader)
   // Parse a simple query that searches for "text":
-  val parser = new QueryParser(ImageDocument.CAPTIONS, analyzer)
+  val parser = new QueryParser(ImageDocument.IMAGE_CAPTIONS, analyzer)
 
   val query : Query = parser.parse("person")
   val query1 :Query = parser.parse("watches")
