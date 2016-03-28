@@ -55,9 +55,11 @@ class ImageDocument (val photoId : String, val  captions : Map[Int,Caption]) ext
     // Todo - frequency map
     val uniqueTermsField : Field = new Field(ImageDocument.UNIQUE_TERMS, rawTerms().keys.toList.mkString(" "), TextField.TYPE_STORED)
     val imageIdField : Field = new Field(ImageDocument.IMAGE_ID, photoId, TextField.TYPE_STORED)
+    val docNameField : Field = new Field(ImageDocument.DOC_NAME, photoId, TextField.TYPE_STORED)
     doc.add(capsField)
     doc.add(uniqueTermsField)
     doc.add(imageIdField)
+    doc.add(docNameField)
     doc
   }
 
@@ -83,6 +85,8 @@ object ImageDocument extends Serializable{
   final val CAPTION2 : String = "CAPTION2"
   final val UNIQUE_TERMS : String = "UNIQUE_TERMS"
   final val IMAGE_ID : String = "IMAGE_ID"
+  final val DOC_NAME : String = "docname"
+
 
   def apply(photoId: String, captions : List[Caption]):ImageDocument = {
     new ImageDocument(photoId,captions.map(c=> (c.captionId, c)).toMap)
