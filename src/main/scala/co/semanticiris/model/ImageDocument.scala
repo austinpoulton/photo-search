@@ -82,6 +82,7 @@ object ImageDocument extends Serializable{
 
 
   final val IMAGE_CAPTIONS : String = "body"
+  final val BENCHMARK : String = "body"
   final val CAPTION2 : String = "CAPTION2"
   final val UNIQUE_TERMS : String = "UNIQUE_TERMS"
   final val IMAGE_ID : String = "IMAGE_ID"
