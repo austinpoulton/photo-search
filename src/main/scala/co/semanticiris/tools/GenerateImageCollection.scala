@@ -25,7 +25,10 @@ object GenerateImageCollection extends  App {
 
   Some(new PrintWriter("/var/irdata/flickrDocs.csv")).foreach{p => p.write(imgCollection.documentString()); p.close}
 
-  val ramDir = imgCollection.directory()
+  //imgCollection.docs.values.map(d => if (d.captions.size < 4) println("insufficient caps: "+d))
+
+
+  val ramDir = imgCollection.indexDocuments()
   val docs =  ramDir.listAll()
   println("# indexed docs: "+docs.length)
   println("indexed = "+docs.mkString(", "))

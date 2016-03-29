@@ -48,8 +48,8 @@ object SearchExperimentDriver extends App {
 
   val collection =  ImageCollection.load("/var/irdata/flickrImageColl.ser")
 
-  val basicDir = collection.directory
-  val stemmedDir = collection.stemmedDirectory
+  val basicDir = collection.indexDocuments()
+  val stemmedDir = collection.indexDocuments(true)
   val reader: IndexReader = DirectoryReader.open(basicDir)
   val searcher: IndexSearcher = new IndexSearcher(reader)
 

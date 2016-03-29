@@ -25,6 +25,7 @@ class ImageDocumentSpec extends FlatSpec {
   it should "be created from a list of captions" in {
     val imageDoc = ImageDocument("img1", captionList)
     println(imageDoc)
+    println(imageDoc.captions(0))
     assert(imageDoc.captions.size == 4)
     assert(imageDoc.rawTerms().size == 8)
   }

@@ -18,10 +18,10 @@ object ImageCollectionSearchDemo extends App {
   println("read in image collcation data!!")
   println(" #terms: "+imgCollection.termCount())
   println(" #docs: "+imgCollection.documentCount())
-  val directory =  imgCollection.directory()
+  val directory =  imgCollection.indexDocuments()
 
-  val persistentDir = imgCollection.directory(false, true, "/var/irdata/directories/testdir")
-  persistentDir.close()
+ // val persistentDir = imgCollection.directory(false, true, "/var/irdata/directories/testdir")
+ //  persistentDir.close()
 
   println("RAM Directory size: "+directory.asInstanceOf[RAMDirectory].ramBytesUsed())
 

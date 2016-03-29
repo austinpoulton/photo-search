@@ -15,12 +15,12 @@ import org.apache.lucene.store.RAMDirectory
   */
 object RetrievalExperimentDriver extends  App {
 
-  def loadQueries(qTopicsFileLocation : String = "/var/irdata/benchmark/input/trecTopics.txt"): Array[QualityQuery] = {
+  def loadQueries(qTopicsFileLocation : String = "/var/irdata/benchmark/input/trecTopics-2.txt"): Array[QualityQuery] = {
     val qReader : TrecTopicsReader = new TrecTopicsReader
     qReader.readQueries(Files.newBufferedReader( Paths.get(qTopicsFileLocation), StandardCharsets.UTF_8))
   }
 
-  def loadRelevanceJudgments(qRelevanceFileLocation : String = "/var/irdata/benchmark/input/trecQRels.txt" ):Judge = {
+  def loadRelevanceJudgments(qRelevanceFileLocation : String = "/var/irdata/benchmark/input/trecQRels-2.txt" ):Judge = {
     new TrecJudge(Files.newBufferedReader(Paths.get(qRelevanceFileLocation), StandardCharsets.UTF_8))
   }
 
@@ -29,7 +29,7 @@ object RetrievalExperimentDriver extends  App {
   val defaultOutputLoc = "/var/irdata/benchmark/output/"
   val collection =  ImageCollection.load("/var/irdata/flickrImageColl.ser")
 
-  val directory  = collection.createDirectory(new StandardAnalyzer())   //OR use: EnglishAnalyzer() for stemmed indexing
+  val directory  = collection.indexDocuments()  //OR use: EnglishAnalyzer() for stemmed indexing
 
   // load queirs and judegments
   val queries = loadQueries()
@@ -42,8 +42,8 @@ object RetrievalExperimentDriver extends  App {
 //  val results = experiment.run(defaultOutputLoc)
 //
 //  Some(new PrintWriter(defaultOutputLoc+ experiment.name +"-stats.csv")).foreach{p => p.write(results.header+results.toCSV()); p.close}
-  val configs = RetrievalConfig.standardConfigSuite(directory)
-  val experiments = RetrievalExperiment.suite("Suite1-",judgements,queries,configs.values.toList,100)
+  val configs = RetrievalConfig.standardConfigSuite()
+  val experiments = RetrievalExperiment.suite("2T-", directory, judgements,queries,configs.values.toList,100)
   //val results = experiments.map(e => e.run(defaultOutputLoc))
   for (e <- experiments) {
     val r = e.run(defaultOutputLoc)

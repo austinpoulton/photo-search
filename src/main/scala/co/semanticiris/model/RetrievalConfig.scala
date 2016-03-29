@@ -15,55 +15,67 @@ import org.apache.lucene.store.{Directory, RAMDirectory}
 /**
   * Created by austin on 26/03/2016.
   */
-class RetrievalConfig(val directory : RAMDirectory, val id : String, val desc : String, val similarity : Similarity) {
+class RetrievalConfig(val id : String, val desc : String, val similarity : Similarity) {
 
-  def searcher(): IndexSearcher = {
-    val reader: IndexReader = DirectoryReader.open(directory)
-    val isearcher: IndexSearcher = new IndexSearcher(reader)
-    // set the specific similarity for this retrieval model
-    isearcher.setSimilarity(similarity)
-    isearcher
-  }
+//  def searcher(): IndexSearcher = {
+//    val reader: IndexReader = DirectoryReader.open(directory)
+//    val isearcher: IndexSearcher = new IndexSearcher(reader)
+//    // set the specific similarity for this retrieval model
+//    isearcher.setSimilarity(similarity)
+//    isearcher
+//  }
 
   override def toString():String = "Retrieval Config:\n" + desc +"\t"+similarity
 }
 
 object RetrievalConfig {
 
-  // Classisc TF-IDF config
-  def apply(dir: RAMDirectory):RetrievalConfig = new RetrievalConfig(dir, "Classic", "Lucene ClassicSimilarity", new ClassicSimilarity())
+  def apply():RetrievalConfig = new RetrievalConfig("Classic", "Lucene ClassicSimilarity", new ClassicSimilarity())
+
+  def apply(id: String, desc : String, similarity : Similarity ):RetrievalConfig = new RetrievalConfig(id, desc, similarity)
 
   // TODO - Add retrieval configs with similarity models
-  def standardConfigSuite(dir : RAMDirectory): Map[String,RetrievalConfig] = {
-      val classic = new RetrievalConfig(dir, "Classic", "Lucene ClassicSimilarity", new ClassicSimilarity())
-      val bm25Standard = new RetrievalConfig(dir, "bm25Standard", "BM25 Standard", new BM25Similarity())
-      val bm25_k1_10_b_05 = new RetrievalConfig(dir, ",bm25_k1_10_b_05","BM25 k1 = 1.0 b = 0.5", new BM25Similarity(1.0f, 0.5f))
-      val dfr_D_L_H1 = new RetrievalConfig(dir, "dfr_D_L_H1","DFR BM = D, AE = L, Norm = H1",
+  def standardConfigSuite(): Map[String,RetrievalConfig] = {
+      val classic = new RetrievalConfig("Classic", "Lucene ClassicSimilarity", new ClassicSimilarity())
+      val bm25Standard = new RetrievalConfig("bm25Standard", "BM25 Standard", new BM25Similarity())
+      val bm25_k1_10_b_05 = new RetrievalConfig(",bm25_k1_10_b_05","BM25 k1 = 1.0 b = 0.5", new BM25Similarity(1.0f, 0.5f))
+      val dfr_D_L_H1 = new RetrievalConfig("dfr_D_L_H1","DFR BM = D, AE = L, Norm = H1",
         new DFRSimilarity((new BasicModelD()).asInstanceOf[BasicModel], new AfterEffectL(), new NormalizationH1()))
+     val dfr_P_B_H2 = new RetrievalConfig("dfr_P_B_H2","DFR BM = P, AE = B, Norm = H2",
+       new DFRSimilarity((new BasicModelP()).asInstanceOf[BasicModel], new AfterEffectB(), new NormalizationH2()))
+
       //return the map of configs
       Map(classic.id -> classic,
           bm25Standard.id ->  bm25Standard,
           bm25_k1_10_b_05.id -> bm25_k1_10_b_05,
-          dfr_D_L_H1.id -> dfr_D_L_H1)
+          dfr_D_L_H1.id -> dfr_D_L_H1,
+          dfr_P_B_H2.id -> dfr_P_B_H2)
   }
 }
 
-class RetrievalExperiment(val name: String, val config: RetrievalConfig, val judgements : Judge, val queries : Array[QualityQuery], val maxResults: Int) {
+class RetrievalExperiment(val name: String, val directory : RAMDirectory, val config: RetrievalConfig, val judgements : Judge, val queries : Array[QualityQuery], val maxResults: Int) {
+
+  def searcher(): IndexSearcher = {
+    val reader: IndexReader = DirectoryReader.open(directory)
+    val isearcher: IndexSearcher = new IndexSearcher(reader)
+    // set the specific similarity for this retrieval model
+    isearcher.setSimilarity(config.similarity)
+    isearcher
+  }
 
   def run(outputDir: String = "/var/irdata/benchmark/output/") : ExperimentResult = {
     val qqParser = RetrievalExperiment.queryParser()
-    val searcher = config.searcher()
+    val isearcher = searcher()
     val submitLog = RetrievalExperiment.submitLogger(outputDir+name+"-log.txt")
     val logger = RetrievalExperiment.logger(false, outputDir+name+"-sum.txt")
     // run the benchmark
-    val qrun: QualityBenchmark = new QualityBenchmark(queries, qqParser, searcher, ImageDocument.DOC_NAME)
+    val qrun: QualityBenchmark = new QualityBenchmark(queries, qqParser, isearcher, ImageDocument.DOC_NAME)
     qrun.setMaxResults(maxResults)
     val stats: Array[QualityStats] = qrun.execute(judgements, submitLog, logger)
 
-
     val avg: QualityStats = QualityStats.average(stats)
     avg.log("SUMMARY", 2, logger, "  ")
-    searcher.getIndexReader.close()
+    isearcher.getIndexReader.close()
     new ExperimentResult(name,queries,stats)
   }
 }
@@ -73,12 +85,12 @@ object RetrievalExperiment {
 //  def apply(config : RetrievalConfig ,judgements : Judge,queries : Array[QualityQuery],maxResults: Int =100): RetrievalExperiment =
 //    RetrievalExperiment(config.id, config,judgements,queries,maxResults)
 
-  def apply(name : String, config : RetrievalConfig ,judgements : Judge,queries : Array[QualityQuery],maxResults: Int =100): RetrievalExperiment = {
-      new RetrievalExperiment(name, config,judgements,queries,maxResults)
+  def apply(name : String, dir: RAMDirectory, config : RetrievalConfig ,judgements : Judge,queries : Array[QualityQuery],maxResults: Int =100): RetrievalExperiment = {
+      new RetrievalExperiment(name, dir, config,judgements,queries,maxResults)
   }
 
-  def suite(suitName : String, judgements : Judge,queries : Array[QualityQuery], configs : List[RetrievalConfig],maxResults: Int):List[RetrievalExperiment] = {
-    configs.map(c => RetrievalExperiment(suitName+c.id,c, judgements, queries, maxResults))
+  def suite(suitName : String, dir: RAMDirectory, judgements : Judge,queries : Array[QualityQuery], configs : List[RetrievalConfig],maxResults: Int):List[RetrievalExperiment] = {
+    configs.map(c => RetrievalExperiment(suitName+c.id,dir, c, judgements, queries, maxResults))
   }
 
   def queryParser(fieldSpec : String = "T"): QualityQueryParser = {
@@ -113,6 +125,6 @@ class ExperimentResult (val expName : String, val queries: Array[QualityQuery], 
   def qStatsToCSVRow(qqId: String, qStr: String, st : QualityStats):String = {
       qqId + "," + qStr + "," + st.getSearchTime+","+ st.getDocNamesExtractTime + "," + st.getNumPoints + ","+st.getNumGoodPoints +
       ","+st.getMaxGoodPoints + "," +st.getAvp + "," + st.getMRR + "," + st.getRecall + "," +
-      (for (i <- 1 to 20) yield st.getPrecisionAt(i)).mkString(",")
+      (for (i <- 1 to 20) yield st.getPrecisionAt(i)).mkString(",") + st.getRecallPoints
   }
 }

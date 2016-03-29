@@ -39,10 +39,3 @@ trait TermOperations {
     }
   }
 }
-
-object TermOperations {
-
-  //val porterFilter = new PorterStemmer()
-
-  //def stem(token : String):String = porterFilter.stem()
-}

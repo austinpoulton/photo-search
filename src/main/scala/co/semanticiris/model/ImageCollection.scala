@@ -7,6 +7,7 @@ import org.apache.lucene.analysis.Analyzer
 import org.apache.lucene.analysis.en.EnglishAnalyzer
 import org.apache.lucene.analysis.standard.StandardAnalyzer
 import org.apache.lucene.index.{IndexWriter, IndexWriterConfig}
+import org.apache.lucene.search.similarities.{ClassicSimilarity, Similarity}
 import org.apache.lucene.store._
 
 import scala.collection.immutable.{HashMap, HashSet}
@@ -66,43 +67,20 @@ class ImageCollection extends Serializable with TermOperations {
   def documentString():String = "PhotoId, Doc Length, Unique Terms\n" + (docs.values.toList.map(d => d.photoId + ","+d.length()+","+d.uniqueTerms())).mkString("\n")
 
 
+  def indexDocuments():RAMDirectory = indexDocuments(new StandardAnalyzer())
 
-  /// directory methods
+  def indexDocuments(stemmed : Boolean):RAMDirectory = if (stemmed) indexDocuments(new EnglishAnalyzer()) else indexDocuments(new StandardAnalyzer())
 
-  def stemmedDirectory = {
-    val analyzer : EnglishAnalyzer = new EnglishAnalyzer()
-    createDirectory(analyzer)
-  }
+  def indexDocuments(analyzer: Analyzer):RAMDirectory = indexDocuments(analyzer, new ClassicSimilarity())
 
-  def directory():Directory = {
-    val analyzer : Analyzer = new StandardAnalyzer()
-    createDirectory(analyzer)
-  }
-
-  def createDirectory(analyzer : Analyzer): RAMDirectory = {
-    val directory : RAMDirectory  = new RAMDirectory()
+  def indexDocuments(analyzer: Analyzer, similarity: Similarity, fieldToIndex : IndexField.Value = IndexField.AllCaptions):RAMDirectory = {
+    val directory =  new RAMDirectory()
     val config : IndexWriterConfig = new IndexWriterConfig(analyzer)
+    config.setSimilarity(similarity)
     // index readers
     val iwriter : IndexWriter  = new IndexWriter(directory,config)
     for (idoc <- docs.values.toList) {
-      iwriter.addDocument(idoc.document())
-    }
-    iwriter.close()
-    directory
-  }
-
-  def directory(isStemmed : Boolean, isPersistent : Boolean, persistentDirloc : String = "/var/irdata/indexes/directory"): Directory = {
-    val directory = if (isPersistent) FSDirectory.open(Paths.get(persistentDirloc)) else new RAMDirectory()
-    val analyzer = if (isStemmed)  new EnglishAnalyzer() else new StandardAnalyzer()
-    indexDocuments(directory,analyzer)
-  }
-
-  def indexDocuments(directory : Directory, analyzer: Analyzer):Directory = {
-    val config : IndexWriterConfig = new IndexWriterConfig(analyzer)
-    // index readers
-    val iwriter : IndexWriter  = new IndexWriter(directory,config)
-    for (idoc <- docs.values.toList) {
-      iwriter.addDocument(idoc.document())
+      iwriter.addDocument(idoc.document(fieldToIndex))
     }
     iwriter.close()
     directory
